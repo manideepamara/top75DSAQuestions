@@ -1,0 +1,39 @@
+// https://neetcode.io/problems/valid-tree
+
+
+class Solution {
+public:
+    vector<vector<int>> graph;
+    vector<bool> visited;
+    bool isCyclic(int from, int parent){
+        for(int to: graph[from]){
+            if(visited[to]){
+                if(to != parent)
+                    return true;
+                continue;
+            }
+            visited[to]=true;
+            if(isCyclic(to, from))
+                return true;
+        }
+        return false;
+    }
+    bool validTree(int n, vector<vector<int>>& edges) {
+        graph.resize(n, {});
+        for(auto edge: edges){
+            graph[edge[0]].push_back(edge[1]);
+            graph[edge[1]].push_back(edge[0]);
+        }
+        visited.resize(n, false);
+        visited[0] = true;
+        if(isCyclic(0, -1))
+                return false;
+        for(int i=1;i<n;i++){
+            if(visited[i])
+                continue;
+            return false;
+        }
+        return true;
+    }
+};
+
