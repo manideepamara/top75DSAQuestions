@@ -1,0 +1,32 @@
+//https://neetcode.io/problems/course-schedule
+
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> graph(numCourses, vector<int>());
+        vector<int> indegree(numCourses, 0);
+        for(auto prerequisite: prerequisites){
+            graph[prerequisite[0]].push_back(prerequisite[1]);
+            indegree[prerequisite[1]]++;
+        }
+
+        queue<int> q;
+        for(int i=0;i<numCourses;i++){
+            if(indegree[i]==0)
+                q.push(i);
+        }
+
+        int finsh = 0;
+        while(q.size()){
+            int from = q.front();
+            q.pop();
+            finsh++;
+            for(int to: graph[from]){
+                indegree[to]--;
+                if(indegree[to]==0)
+                    q.push(to);
+            }
+        }
+        return finsh == numCourses;
+    }
+};
