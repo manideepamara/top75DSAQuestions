@@ -1,0 +1,97 @@
+#PRoblem link: https://neetcode.io/problems/foreign-dictionary
+
+class Solution {
+public:
+    vector<bool> visited;
+    vector<vector<bool>> graph;
+    bool isCyclic(char node){
+        // cout << node << "->";
+        for(int i=0;i<26;i++){
+            if(!graph[node-'a'][i])
+                continue;
+            if(visited[i])
+                return true;
+            visited[i]=true;
+            if(isCyclic(i+'a'))
+                return true;
+            visited[i]=false;
+        }
+        return false;
+    }
+    string dfs(char node){
+        string word = "";
+        word+=node;
+        for(int i=0;i<26;i++){
+            //cout << child << "\n";
+            if(!graph[node-'a'][i])
+                continue;
+            if( visited[i])
+                continue;
+            visited[i] = true;
+            word+=dfs(i+'a');
+        }
+        return word;
+    }
+    vector<char> findPair(string word1, string word2){
+        int size1 = word1.size();
+        int size2 = word2.size();
+        int size = min(size1,size2);
+        int i=0;
+        while(i<size && word1[i]==word2[i]){
+            i++;
+        }
+        if(i==size){
+            return  {};
+        }
+        return {word1[i], word2[i]};
+    }
+    string foreignDictionary(vector<string>& words) {
+        vector<vector<char>> edges = {};
+        int n = words.size();
+       
+        for(int i=1;i<n;i++){
+            vector<char> edge = findPair(words[i-1], words[i]);
+            if(edge.size()==0){
+                if(words[i-1].size()> words[i].size())
+                    return "";
+                continue;
+            }
+            edges.push_back(edge);
+        }
+        
+        vector<bool> uniqueChars(26,false);
+        for(string word: words){
+            for(char ch:word){
+                uniqueChars[ch-'a'] = true;
+            }
+        }
+        graph.resize(26, vector<bool>(26,false));
+        for(auto edge: edges){
+            // cout << edge[0] << "->" << edge[1]<<"\n";
+            graph[edge[0]-'a'][edge[1]-'a']=true;
+        }
+        string finalWord = "";
+        visited.resize(26, false);
+        for(int i=0;i<26;i++){
+            if(!uniqueChars[i])
+                continue;
+            visited[i] = true;
+            if(isCyclic(i+'a')){
+                return "";
+            }
+            // cout << "\n";
+            visited[i]= false;
+        }
+        for(int i=0;i<26;i++){
+            char node = (char)(i+'a');
+            if(visited[i] || !uniqueChars[i])
+                continue;
+            visited[i] = true;
+            //cout << dfs(node) <<"\n";
+            string word = dfs(node);
+            finalWord = word+finalWord;
+        }
+
+        return finalWord;
+    }
+};
