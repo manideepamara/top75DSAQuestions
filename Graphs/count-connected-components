@@ -1,0 +1,36 @@
+//Problem Link: https://neetcode.io/problems/count-connected-components
+
+class Solution {
+public:
+    int countComponents(int n, vector<vector<int>>& edges) {
+        vector<vector<int>> graph(n);
+        for(auto edge: edges){
+            graph[edge[0]].push_back(edge[1]);
+            graph[edge[1]].push_back(edge[0]);
+        }
+
+        int count = 0;
+        vector<bool> visited(n, false);
+
+        for(int i=0;i<n;i++){
+            if(visited[i])
+                continue;
+            queue<int> q;
+            q.push(i);
+            visited[i] = true;
+            while(q.size()){
+                int from = q.front();
+                q.pop();
+                for(int to: graph[from]){
+                    if(visited[to])
+                        continue;
+                    visited[to] = true;
+                    q.push(to);
+                }
+            }
+            count++;
+        }
+
+        return count;
+    }
+};
